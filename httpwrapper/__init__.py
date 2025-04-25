@@ -6,7 +6,7 @@ from httpx import Client, RequestError, Response
 
 
 @dataclass
-class RequestConfig:
+class ClientConfig:
     retry = 99
     timeout = 99
     sleep_time = 1
@@ -31,10 +31,10 @@ class BaseClient:
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        request_config: RequestConfig | None = None,
+        config: ClientConfig | None = None,
     ) -> Response:
-        request_config = request_config or RequestConfig()
-        count, _sleep_time = 0, request_config.sleep_time
+        config = config or ClientConfig()
+        count, _sleep_time = 0, config.sleep_time
         params, json_data = params or {}, json_data or {}
 
         while True:
@@ -50,7 +50,7 @@ class BaseClient:
                     url=url,
                     params=params,
                     json=json_data,
-                    timeout=request_config.timeout,
+                    timeout=config.timeout,
                 )
                 self.__logger.debug(
                     f"Response: {response.status_code}\n"
@@ -59,48 +59,47 @@ class BaseClient:
                 return response
             except (RequestError, Exception) as e:
                 self.__logger.error(
-                    f"Attempt {count}/{request_config.retry} failed {url}: {str(e)}"
+                    f"Attempt {count}/{config.retry} failed {url}: {str(e)}"
                 )
-                if count >= request_config.retry:
+                if count >= config.retry:
                     self.__logger.error(f"Max retries exceeded {url}: {e} ({type(e)})")
                     raise e
                 sleep(_sleep_time)
-                _sleep_time += request_config.sleep_time_increment
+                _sleep_time += config.sleep_time_increment
 
     def _get(
         self,
         url: str,
         params: dict | None = None,
-        config: RequestConfig | None = None,
+        config: ClientConfig | None = None,
     ) -> Response:
-        return self._request("GET", url, params=params, request_config=config)
+        return self._request("GET", url, params, config=config)
 
     def _post(
         self,
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        config: RequestConfig | None = None,
+        config: ClientConfig | None = None,
     ) -> Response:
-        return self._request(
-            "POST", url, params=params, json_data=json_data, request_config=config
-        )
+        return self._request("POST", url, params, json_data, config)
 
     def _put(
         self,
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        config: RequestConfig | None = None,
+        config: ClientConfig | None = None,
     ) -> Response:
-        return self._request(
-            "PUT", url, params=params, json_data=json_data, request_config=config
-        )
+        return self._request("PUT", url, params, json_data, config)
 
     def _delete(
         self,
         url: str,
         params: dict | None = None,
-        config: RequestConfig | None = None,
+        config: ClientConfig | None = None,
     ) -> Response:
-        return self._request("DELETE", url, params=params, request_config=config)
+        return self._request("DELETE", url, params, config=config)
+
+
+__all__ = ["BaseClient", "ClientConfig"]
