@@ -7,10 +7,10 @@ from httpx import Client, RequestError, Response
 
 @dataclass
 class ClientConfig:
-    retry = 99
-    timeout = 99
-    sleep_time = 1
-    sleep_time_increment = 3
+    retry: int = 99
+    timeout: int = 99
+    sleep_time: int = 1
+    sleep_time_increment: int = 3
 
 
 class BaseClient:
