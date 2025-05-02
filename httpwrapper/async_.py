@@ -2,40 +2,45 @@ import logging
 from dataclasses import dataclass
 from time import sleep
 
-from httpx import Client, RequestError, Response
-
-from .async_ import AsyncClientConfig, BaseAsyncClient
+from aiohttp import BasicAuth, ClientResponse, ClientSession, ClientTimeout
 
 
 @dataclass
-class ClientConfig:
+class AsyncClientConfig:
     retry: int = 99
-    timeout: int = 99
+    timeout: ClientTimeout = ClientTimeout(total=99)
     sleep_time: int = 1
     sleep_time_increment: int = 3
 
 
-class BaseClient:
+class BaseAsyncClient:
     def __init__(
         self,
         host: str,
         headers: dict | None = None,
         auth: tuple[str, str] | None = None,
     ):
-        if host.endswith("/"):
-            host = host[:-1]
-        self.__client = Client(base_url=host, headers=headers or {}, auth=auth)
+        if not host.endswith("/"):
+            host = host + "/"
+        basic_auth = BasicAuth(auth[0], auth[1]) if auth else None
+        self.__client = ClientSession(
+            base_url=host,
+            auth=basic_auth,
+            headers=headers or {},
+        )
         self.__logger = logging.getLogger(self.__class__.__name__)
 
-    def _request(
+    async def _request(
         self,
         method: str,
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        config: ClientConfig | None = None,
-    ) -> Response:
-        config = config or ClientConfig()
+        config: AsyncClientConfig | None = None,
+    ) -> ClientResponse:
+        if url.startswith("/"):
+            url = url[1:]
+        config = config or AsyncClientConfig()
         count, _sleep_time = 0, config.sleep_time
         params, json_data = params or {}, json_data or {}
 
@@ -47,19 +52,14 @@ class BaseClient:
                     f"Params: {params}\n"
                     f"JSON: {json_data}"
                 )
-                response = self.__client.request(
+                return await self.__client.request(
                     method=method,
                     url=url,
                     params=params,
                     json=json_data,
                     timeout=config.timeout,
                 )
-                self.__logger.debug(
-                    f"Response: {response.status_code}\n"
-                    f"Content: {response.text[:200]}..."
-                )
-                return response
-            except (RequestError, Exception) as e:
+            except Exception as e:
                 self.__logger.error(
                     f"Attempt {count}/{config.retry} failed {url}: {str(e)}"
                 )
@@ -69,39 +69,39 @@ class BaseClient:
                 sleep(_sleep_time)
                 _sleep_time += config.sleep_time_increment
 
-    def _get(
+    async def _get(
         self,
         url: str,
         params: dict | None = None,
-        config: ClientConfig | None = None,
-    ) -> Response:
-        return self._request("GET", url, params, config=config)
+        config: AsyncClientConfig | None = None,
+    ) -> ClientResponse:
+        return await self._request("GET", url, params, config=config)
 
-    def _post(
-        self,
-        url: str,
-        params: dict | None = None,
-        json_data: dict | None = None,
-        config: ClientConfig | None = None,
-    ) -> Response:
-        return self._request("POST", url, params, json_data, config)
-
-    def _put(
+    async def _post(
         self,
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        config: ClientConfig | None = None,
-    ) -> Response:
-        return self._request("PUT", url, params, json_data, config)
+        config: AsyncClientConfig | None = None,
+    ) -> ClientResponse:
+        return await self._request("POST", url, params, json_data, config)
 
-    def _delete(
+    async def _put(
         self,
         url: str,
         params: dict | None = None,
-        config: ClientConfig | None = None,
-    ) -> Response:
-        return self._request("DELETE", url, params, config=config)
+        json_data: dict | None = None,
+        config: AsyncClientConfig | None = None,
+    ) -> ClientResponse:
+        return await self._request("PUT", url, params, json_data, config)
 
+    async def _delete(
+        self,
+        url: str,
+        params: dict | None = None,
+        config: AsyncClientConfig | None = None,
+    ) -> ClientResponse:
+        return await self._request("DELETE", url, params, config=config)
 
-__all__ = ["BaseClient", "ClientConfig", "BaseAsyncClient", "AsyncClientConfig"]
+    async def close(self):
+        await self.__client.close()
