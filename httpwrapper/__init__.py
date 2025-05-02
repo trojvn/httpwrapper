@@ -22,8 +22,8 @@ class BaseClient:
         headers: dict | None = None,
         auth: tuple[str, str] | None = None,
     ):
-        if host.endswith("/"):
-            host = host[:-1]
+        if not host.endswith("/"):
+            host = host + "/"
         self.__client = Client(base_url=host, headers=headers or {}, auth=auth)
         self.__logger = logging.getLogger(self.__class__.__name__)
 
