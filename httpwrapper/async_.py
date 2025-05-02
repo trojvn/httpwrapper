@@ -38,6 +38,8 @@ class BaseAsyncClient:
         json_data: dict | None = None,
         config: AsyncClientConfig | None = None,
     ) -> ClientResponse:
+        if url.startswith("/"):
+            url = url[1:]
         config = config or AsyncClientConfig()
         count, _sleep_time = 0, config.sleep_time
         params, json_data = params or {}, json_data or {}
