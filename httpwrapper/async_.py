@@ -18,15 +18,17 @@ class BaseAsyncClient:
         self,
         host: str,
         headers: dict | None = None,
+        cookies: dict | None = None,
         auth: tuple[str, str] | None = None,
     ):
         if not host.endswith("/"):
             host = host + "/"
         basic_auth = BasicAuth(auth[0], auth[1]) if auth else None
-        self.__client = ClientSession(
+        self._client = ClientSession(
             base_url=host,
             auth=basic_auth,
             headers=headers or {},
+            cookies=cookies or {},
         )
         self.__logger = logging.getLogger(self.__class__.__name__)
 
@@ -52,7 +54,7 @@ class BaseAsyncClient:
                     f"Params: {params}\n"
                     f"JSON: {json_data}"
                 )
-                return await self.__client.request(
+                return await self._client.request(
                     method=method,
                     url=url,
                     params=params,
@@ -104,4 +106,4 @@ class BaseAsyncClient:
         return await self._request("DELETE", url, params, config=config)
 
     async def close(self):
-        await self.__client.close()
+        await self._client.close()

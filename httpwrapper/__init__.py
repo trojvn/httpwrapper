@@ -20,11 +20,17 @@ class BaseClient:
         self,
         host: str,
         headers: dict | None = None,
+        cookies: dict | None = None,
         auth: tuple[str, str] | None = None,
     ):
         if host.endswith("/"):
             host = host[:-1]
-        self.__client = Client(base_url=host, headers=headers or {}, auth=auth)
+        self._client = Client(
+            base_url=host,
+            headers=headers or {},
+            cookies=cookies or {},
+            auth=auth,
+        )
         self.__logger = logging.getLogger(self.__class__.__name__)
 
     def _request(
@@ -47,7 +53,7 @@ class BaseClient:
                     f"Params: {params}\n"
                     f"JSON: {json_data}"
                 )
-                response = self.__client.request(
+                response = self._client.request(
                     method=method,
                     url=url,
                     params=params,
