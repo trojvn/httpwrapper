@@ -50,18 +50,13 @@ class BaseAsyncClient:
                     f"Params: {params}\n"
                     f"JSON: {json_data}"
                 )
-                response = await self.__client.request(
+                return await self.__client.request(
                     method=method,
                     url=url,
                     params=params,
                     json=json_data,
                     timeout=config.timeout,
                 )
-                text = await response.text()
-                self.__logger.debug(
-                    f"Response: {response.status}\nContent: {text[:200]}..."
-                )
-                return response
             except Exception as e:
                 self.__logger.error(
                     f"Attempt {count}/{config.retry} failed {url}: {str(e)}"
