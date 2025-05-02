@@ -105,3 +105,6 @@ class BaseAsyncClient:
         config: AsyncClientConfig | None = None,
     ) -> ClientResponse:
         return await self._request("DELETE", url, params, config=config)
+
+    async def close(self):
+        await self.__client.close()
