@@ -4,8 +4,6 @@ from time import sleep
 
 from httpx import Client, RequestError, Response
 
-from .async_ import AsyncClientConfig, BaseAsyncClient
-
 
 @dataclass
 class ClientConfig:
@@ -22,8 +20,8 @@ class BaseClient:
         headers: dict | None = None,
         auth: tuple[str, str] | None = None,
     ):
-        if not host.endswith("/"):
-            host = host + "/"
+        if host.endswith("/"):
+            host = host[:-1]
         self.__client = Client(base_url=host, headers=headers or {}, auth=auth)
         self.__logger = logging.getLogger(self.__class__.__name__)
 
@@ -104,4 +102,4 @@ class BaseClient:
         return self._request("DELETE", url, params, config=config)
 
 
-__all__ = ["BaseClient", "ClientConfig", "BaseAsyncClient", "AsyncClientConfig"]
+__all__ = ["BaseClient", "ClientConfig"]
