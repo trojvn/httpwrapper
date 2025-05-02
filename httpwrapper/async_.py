@@ -20,8 +20,8 @@ class BaseAsyncClient:
         headers: dict | None = None,
         auth: tuple[str, str] | None = None,
     ):
-        if host.endswith("/"):
-            host = host[:-1]
+        if not host.endswith("/"):
+            host = host + "/"
         basic_auth = BasicAuth(auth[0], auth[1]) if auth else None
         self.__client = ClientSession(
             base_url=host,
