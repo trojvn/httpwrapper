@@ -13,6 +13,7 @@ class ClientConfig:
     timeout: int = 99
     sleep_time: int = 1
     sleep_time_increment: int = 3
+    follow_redirects: bool = False
 
 
 class BaseClient:
@@ -22,14 +23,17 @@ class BaseClient:
         headers: dict | None = None,
         cookies: dict | None = None,
         auth: tuple[str, str] | None = None,
+        config: ClientConfig | None = None,
     ):
         if host.endswith("/"):
             host = host[:-1]
+        self.__config = config or ClientConfig()
         self._client = Client(
+            auth=auth,
             base_url=host,
             headers=headers or {},
             cookies=cookies or {},
-            auth=auth,
+            follow_redirects=self.__config.follow_redirects,
         )
         self.__logger = logging.getLogger(self.__class__.__name__)
 
@@ -41,7 +45,7 @@ class BaseClient:
         json_data: dict | None = None,
         config: ClientConfig | None = None,
     ) -> Response:
-        config = config or ClientConfig()
+        config = config or self.__config
         count, _sleep_time = 0, config.sleep_time
         params, json_data = params or {}, json_data or {}
 
@@ -54,11 +58,12 @@ class BaseClient:
                     f"JSON: {json_data}"
                 )
                 response = self._client.request(
-                    method=method,
                     url=url,
+                    method=method,
                     params=params,
                     json=json_data,
                     timeout=config.timeout,
+                    follow_redirects=config.follow_redirects,
                 )
                 self.__logger.debug(
                     f"Response: {response.status_code}\n"

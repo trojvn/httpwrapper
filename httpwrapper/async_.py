@@ -11,6 +11,7 @@ class AsyncClientConfig:
     timeout: ClientTimeout = ClientTimeout(total=99)
     sleep_time: int = 1
     sleep_time_increment: int = 3
+    allow_redirects: bool = False
 
 
 class BaseAsyncClient:
@@ -20,10 +21,12 @@ class BaseAsyncClient:
         headers: dict | None = None,
         cookies: dict | None = None,
         auth: tuple[str, str] | None = None,
+        config: AsyncClientConfig | None = None,
     ):
         if not host.endswith("/"):
             host = host + "/"
         basic_auth = BasicAuth(auth[0], auth[1]) if auth else None
+        self.__config = config or AsyncClientConfig()
         self._client = ClientSession(
             base_url=host,
             auth=basic_auth,
@@ -42,7 +45,7 @@ class BaseAsyncClient:
     ) -> ClientResponse:
         if url.startswith("/"):
             url = url[1:]
-        config = config or AsyncClientConfig()
+        config = config or self.__config
         count, _sleep_time = 0, config.sleep_time
         params, json_data = params or {}, json_data or {}
 
@@ -55,11 +58,12 @@ class BaseAsyncClient:
                     f"JSON: {json_data}"
                 )
                 return await self._client.request(
-                    method=method,
                     url=url,
+                    method=method,
                     params=params,
                     json=json_data,
                     timeout=config.timeout,
+                    allow_redirects=config.allow_redirects,
                 )
             except Exception as e:
                 self.__logger.error(
