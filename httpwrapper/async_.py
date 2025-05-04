@@ -30,8 +30,8 @@ class BaseAsyncClient:
         self._client = ClientSession(
             base_url=host,
             auth=basic_auth,
-            headers=headers or {},
-            cookies=cookies or {},
+            headers=headers or None,
+            cookies=cookies or None,
         )
         self.__logger = logging.getLogger(self.__class__.__name__)
 
@@ -47,7 +47,7 @@ class BaseAsyncClient:
             url = url[1:]
         config = config or self.__config
         count, _sleep_time = 0, config.sleep_time
-        params, json_data = params or {}, json_data or {}
+        params, json_data = params or None, json_data or None
 
         while True:
             count += 1

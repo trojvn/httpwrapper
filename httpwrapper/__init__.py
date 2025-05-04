@@ -31,8 +31,8 @@ class BaseClient:
         self._client = Client(
             auth=auth,
             base_url=host,
-            headers=headers or {},
-            cookies=cookies or {},
+            headers=headers or None,
+            cookies=cookies or None,
             follow_redirects=self.__config.follow_redirects,
         )
         self.__logger = logging.getLogger(self.__class__.__name__)
@@ -47,7 +47,7 @@ class BaseClient:
     ) -> Response:
         config = config or self.__config
         count, _sleep_time = 0, config.sleep_time
-        params, json_data = params or {}, json_data or {}
+        params, json_data = params or None, json_data or None
 
         while True:
             count += 1
