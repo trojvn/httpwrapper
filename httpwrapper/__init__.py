@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from io import BufferedReader
 from time import sleep
 
 from httpx import Client, RequestError, Response
@@ -44,6 +45,7 @@ class BaseClient:
         params: dict | None = None,
         json_data: dict | None = None,
         config: ClientConfig | None = None,
+        content: BufferedReader | None = None,
     ) -> Response:
         config = config or self.__config
         count, _sleep_time = 0, config.sleep_time
@@ -62,6 +64,7 @@ class BaseClient:
                     method=method,
                     params=params,
                     json=json_data,
+                    content=content,
                     timeout=config.timeout,
                     follow_redirects=config.follow_redirects,
                 )
@@ -103,8 +106,9 @@ class BaseClient:
         params: dict | None = None,
         json_data: dict | None = None,
         config: ClientConfig | None = None,
+        content: BufferedReader | None = None,
     ) -> Response:
-        return self._request("PUT", url, params, json_data, config)
+        return self._request("PUT", url, params, json_data, config, content)
 
     def _delete(
         self,
