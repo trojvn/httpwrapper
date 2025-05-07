@@ -43,8 +43,8 @@ class BaseAsyncClient:
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
+        data: BufferedReader | None = None,
         config: AsyncClientConfig | None = None,
-        content: BufferedReader | None = None,
     ) -> ClientResponse:
         if url.startswith("/"):
             url = url[1:]
@@ -62,12 +62,12 @@ class BaseAsyncClient:
                 )
                 return await self._client.request(
                     url=url,
+                    data=data,
                     method=method,
                     params=params,
                     json=json_data,
                     timeout=config.timeout,
                     allow_redirects=config.allow_redirects,
-                    data=content,
                 )
             except Exception as e:
                 self.__logger.error(
@@ -92,20 +92,20 @@ class BaseAsyncClient:
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        content: BufferedReader | None = None,
+        data: BufferedReader | None = None,
         config: AsyncClientConfig | None = None,
     ) -> ClientResponse:
-        return await self._request("POST", url, params, json_data, config, content)
+        return await self._request("POST", url, params, json_data, data, config)
 
     async def _put(
         self,
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
-        content: BufferedReader | None = None,
+        data: BufferedReader | None = None,
         config: AsyncClientConfig | None = None,
     ) -> ClientResponse:
-        return await self._request("PUT", url, params, json_data, config, content)
+        return await self._request("PUT", url, params, json_data, data, config)
 
     async def _delete(
         self,
