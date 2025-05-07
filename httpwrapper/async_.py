@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from dataclasses import dataclass
+from io import BufferedReader
 from time import sleep
 
 from aiohttp import BasicAuth, ClientResponse, ClientSession, ClientTimeout
@@ -43,6 +44,7 @@ class BaseAsyncClient:
         params: dict | None = None,
         json_data: dict | None = None,
         config: AsyncClientConfig | None = None,
+        content: BufferedReader | None = None,
     ) -> ClientResponse:
         if url.startswith("/"):
             url = url[1:]
@@ -65,6 +67,7 @@ class BaseAsyncClient:
                     json=json_data,
                     timeout=config.timeout,
                     allow_redirects=config.allow_redirects,
+                    data=content,
                 )
             except Exception as e:
                 self.__logger.error(
@@ -89,18 +92,20 @@ class BaseAsyncClient:
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
+        content: BufferedReader | None = None,
         config: AsyncClientConfig | None = None,
     ) -> ClientResponse:
-        return await self._request("POST", url, params, json_data, config)
+        return await self._request("POST", url, params, json_data, config, content)
 
     async def _put(
         self,
         url: str,
         params: dict | None = None,
         json_data: dict | None = None,
+        content: BufferedReader | None = None,
         config: AsyncClientConfig | None = None,
     ) -> ClientResponse:
-        return await self._request("PUT", url, params, json_data, config)
+        return await self._request("PUT", url, params, json_data, config, content)
 
     async def _delete(
         self,

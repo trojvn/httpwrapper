@@ -97,8 +97,9 @@ class BaseClient:
         params: dict | None = None,
         json_data: dict | None = None,
         config: ClientConfig | None = None,
+        content: BufferedReader | None = None,
     ) -> Response:
-        return self._request("POST", url, params, json_data, config)
+        return self._request("POST", url, params, json_data, config, content)
 
     def _put(
         self,
