@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import logging
 from dataclasses import dataclass
 from io import BufferedReader
@@ -119,8 +120,9 @@ class BaseAsyncClient:
         await self._client.close()
 
     def __del__(self):
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            loop.create_task(self.close())
-        else:
-            loop.run_until_complete(self.close())
+        with contextlib.suppress(Exception):
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                loop.create_task(self.close())
+            else:
+                loop.run_until_complete(self.close())
