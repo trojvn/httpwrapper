@@ -56,11 +56,10 @@ class BaseAsyncClient:
         while True:
             count += 1
             try:
-                self.__logger.debug(
-                    f"Request: {method.upper()} {url}\n"
-                    f"Params: {params}\n"
-                    f"JSON: {json_data}"
-                )
+                message = f"Request: {method.upper()} {url}\nParams: {params}"
+                if json_data:
+                    message += f"\nJSON: {json_data}"
+                self.__logger.debug(message)
                 return await self._client.request(
                     url=url,
                     data=data,
