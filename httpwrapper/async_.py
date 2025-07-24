@@ -6,6 +6,7 @@ from io import BufferedReader
 from time import sleep
 
 from aiohttp import BasicAuth, ClientResponse, ClientSession, ClientTimeout
+from aiohttp_socks import ProxyConnector
 
 
 @dataclass
@@ -15,6 +16,7 @@ class AsyncClientConfig:
     sleep_time: int = 1
     sleep_time_increment: int = 3
     allow_redirects: bool = False
+    proxy: str | None = None
 
 
 class BaseAsyncClient:
@@ -30,11 +32,15 @@ class BaseAsyncClient:
             host = host + "/"
         basic_auth = BasicAuth(auth[0], auth[1]) if auth else None
         self.__config = config or AsyncClientConfig()
+        self.__connector = None
+        if self.__config.proxy:
+            self.__connector = ProxyConnector.from_url(self.__config.proxy)
         self._client = ClientSession(
             base_url=host,
             auth=basic_auth,
             headers=headers or None,
             cookies=cookies or None,
+            connector=self.__connector,
         )
         self.__logger = logging.getLogger(self.__class__.__name__)
 
