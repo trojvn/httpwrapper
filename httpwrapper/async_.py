@@ -43,6 +43,7 @@ class BaseAsyncClient:
             connector=self.__connector,
         )
         self.__logger = logging.getLogger(self.__class__.__name__)
+        self.__logger.debug(f"Proxy: {self.__config.proxy}")
 
     async def _request(
         self,
