@@ -115,18 +115,18 @@ speedups = ["Brotli", "aiodns (>=3.2.0)", "brotlicffi"]
 
 [[package]]
 name = "aiohttp-socks"
-version = "0.10.1"
+version = "0.8.3"
 description = "Proxy connector for aiohttp"
 optional = false
-python-versions = ">=3.8.0"
+python-versions = "*"
 files = [
-    {file = "aiohttp_socks-0.10.1-py3-none-any.whl", hash = "sha256:6fd4d46c09f952f971a011ff446170daab8d539cf5310c0627f8423df2fb15ea"},
-    {file = "aiohttp_socks-0.10.1.tar.gz", hash = "sha256:49f2e1f8051f2885719beb1b77e312b5a27c3e4b60f0b045a388f194d995e068"},
+    {file = "aiohttp_socks-0.8.3-py3-none-any.whl", hash = "sha256:04bed72d21561f5ae8199da1cf845bede27c6b6ba42a0ab7e8f71f7e00e9a23a"},
+    {file = "aiohttp_socks-0.8.3.tar.gz", hash = "sha256:6aab528f669e0873018fd37773b833a2e2ba284243be672817fa401bc7941ec6"},
 ]
 
 [package.dependencies]
-aiohttp = ">=3.10.0"
-python-socks = {version = ">=2.4.3,<3.0.0", extras = ["asyncio"]}
+aiohttp = ">=2.3.2"
+python-socks = {version = ">=2.0.0,<3.0.0", extras = ["asyncio"]}
 
 [[package]]
 name = "aiosignal"
@@ -162,6 +162,17 @@ typing_extensions = {version = ">=4.5", markers = "python_version < \"3.13\""}
 doc = ["Sphinx (>=8.2,<9.0)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphinx_rtd_theme"]
 test = ["anyio[trio]", "blockbuster (>=1.5.23)", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypothesis (>=4.0)", "psutil (>=5.9)", "pytest (>=7.0)", "trustme", "truststore (>=0.9.1)", "uvloop (>=0.21)"]
 trio = ["trio (>=0.26.1)"]
+
+[[package]]
+name = "async-timeout"
+version = "5.0.1"
+description = "Timeout context manager for asyncio programs"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c"},
+    {file = "async_timeout-5.0.1.tar.gz", hash = "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3"},
+]
 
 [[package]]
 name = "attrs"
@@ -598,20 +609,23 @@ files = [
 
 [[package]]
 name = "python-socks"
-version = "2.7.1"
-description = "Proxy (SOCKS4, SOCKS5, HTTP CONNECT) client for Python"
+version = "2.1.1"
+description = "Core proxy (SOCKS4, SOCKS5, HTTP tunneling) functionality for Python"
 optional = false
-python-versions = ">=3.8.0"
+python-versions = "*"
 files = [
-    {file = "python_socks-2.7.1-py3-none-any.whl", hash = "sha256:2603c6454eeaeb82b464ad705be188989e8cf1a4a16f0af3c921d6dd71a49cec"},
-    {file = "python_socks-2.7.1.tar.gz", hash = "sha256:f1a0bb603830fe81e332442eada96757b8f8dec02bd22d1d6f5c99a79704c550"},
+    {file = "python-socks-2.1.1.tar.gz", hash = "sha256:3bb68964c97690d5a3eab6c12a772f415725f295b148cbe1ca8870cb47ebcb96"},
+    {file = "python_socks-2.1.1-py3-none-any.whl", hash = "sha256:6174278b0e005bd36b5d43681a0a3d816922852c9bccc2eceb17c60f4c8d4048"},
 ]
 
+[package.dependencies]
+async-timeout = {version = ">=3.0.1", optional = true, markers = "extra == \"asyncio\""}
+
 [package.extras]
-anyio = ["anyio (>=3.3.4,<5.0.0)"]
-asyncio = ["async-timeout (>=4.0)"]
+anyio = ["anyio (>=3.3.4)"]
+asyncio = ["async-timeout (>=3.0.1)"]
 curio = ["curio (>=1.4)"]
-trio = ["trio (>=0.24)"]
+trio = ["trio (>=0.16.0)"]
 
 [[package]]
 name = "sniffio"
@@ -756,4 +770,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "4cc6b38fb4bb9d16e4060841e8bb4ef2129d3b915176734208ae7c8678fccc90"
+content-hash = "8e2d4fc9e077b379e40fbef46688891e3cb890d88527378f7019496e2b8904f0"
