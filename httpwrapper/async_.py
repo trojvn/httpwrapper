@@ -65,6 +65,8 @@ class BaseAsyncClient:
                 message = f"Request: {method.upper()} {url}\nParams: {params}"
                 if json_data:
                     message += f"\nJSON: {json_data}"
+                if self.__config.proxy:
+                    message += f"\nProxy: {self.__config.proxy}"
                 self.__logger.debug(message)
                 return await self._client.request(
                     url=url,
